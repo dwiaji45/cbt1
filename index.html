@@ -3,57 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rumah Bekam Monggang</title>
+    <title>Reservasi Rumah Bekam Monggang</title>
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; max-width: 500px; margin: auto; }
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 500px; margin: auto; background-color: #f9f9f9;}
         h2 { text-align: center; color: #2c3e50; }
+        .form-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
         .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px;}
         input, textarea, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-        button { width: 100%; padding: 10px; background-color: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        button { width: 100%; padding: 12px; background-color: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold;}
         button:hover { background-color: #2ecc71; }
         #pesan { margin-top: 15px; text-align: center; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <h2>Form Reservasi Bekam</h2>
-    
-    <form id="bookingForm">
-        <div class="form-group">
-            <label>Nama Lengkap</label>
-            <input type="text" id="nama" required>
-        </div>
-        <div class="form-group">
-            <label>Nomor WhatsApp</label>
-            <input type="number" id="no_wa" required>
-        </div>
-        <div class="form-group">
-            <label>Tanggal Bekam</label>
-            <input type="date" id="tanggal" required>
-        </div>
-        <div class="form-group">
-            <label>Pilih Jam</label>
-            <select id="jam" required>
-                <option value="09:00">09:00 WIB</option>
-                <option value="13:00">11:00 WIB</option>
-                <option value="16:00">13:00 WIB</option>
-                <option value="09:00">15:00 WIB</option>
-                <option value="13:00">17:00 WIB</option>
-                <option value="16:00">19:00 WIB</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Keluhan Utama</label>
-            <textarea id="keluhan" rows="3" required placeholder="Misal: Pegal-pegal, tensi tinggi..."></textarea>
-        </div>
-        <button type="submit" id="btnSubmit">Kirim Reservasi</button>
-    </form>
+    <div class="form-container">
+        <h2>Form Reservasi Bekam</h2>
+        
+        <form id="bookingForm">
+            <div class="form-group">
+                <label>Nama Lengkap</label>
+                <input type="text" id="nama" required>
+            </div>
+            <div class="form-group">
+                <label>Nomor WhatsApp (Contoh: 0812...)</label>
+                <input type="number" id="no_wa" required>
+            </div>
+            <div class="form-group">
+                <label>Tanggal Bekam</label>
+                <input type="date" id="tanggal" required>
+            </div>
+            <div class="form-group">
+                <label>Pilih Jam</label>
+                <select id="jam" required>
+                    <option value="" disabled selected>-- Pilih Waktu --</option>
+                    <option value="09:00">09:00 WIB</option>
+                    <option value="13:00">13:00 WIB</option>
+                    <option value="16:00">16:00 WIB</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Keluhan Utama</label>
+                <textarea id="keluhan" rows="3" required placeholder="Misal: Pegal-pegal, tensi tinggi, kolesterol..."></textarea>
+            </div>
+            <button type="submit" id="btnSubmit">Kirim Reservasi</button>
+        </form>
 
-    <div id="pesan"></div>
+        <div id="pesan"></div>
+    </div>
 
     <script>
-        // GANTI URL DI BAWAH INI DENGAN URL WEB APP APPS SCRIPT ANDA
+        // URL Web App GAS Anda
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz0UPb8fuwA8PqaqFgpjOjgsyDbCsFO_TGci1pILKwYcndfxRZLIIOyqu4HqnHdSVqe7w/exec';
 
         document.getElementById('bookingForm').addEventListener('submit', function(e) {
@@ -82,16 +83,16 @@
             .then(result => {
                 if(result.status === "success") {
                     pesan.style.color = "green";
-                    pesan.innerText = "Reservasi berhasil! Kami akan menghubungi Anda segera.";
+                    pesan.innerText = "✅ Reservasi berhasil! Kami akan menghubungi Anda segera.";
                     document.getElementById('bookingForm').reset();
                 } else {
                     pesan.style.color = "red";
-                    pesan.innerText = "Terjadi kesalahan. Silakan coba lagi.";
+                    pesan.innerText = "❌ Terjadi kesalahan backend. Coba lagi.";
                 }
             })
             .catch(error => {
                 pesan.style.color = "red";
-                pesan.innerText = "Gagal terhubung ke server.";
+                pesan.innerText = "❌ Gagal terhubung ke server.";
             })
             .finally(() => {
                 btnSubmit.innerText = "Kirim Reservasi";
