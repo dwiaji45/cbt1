@@ -5,70 +5,90 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Admin - Rumah Bekam Monggang</title>
     <style>
-        body { font-family: Nunito, sans-serif; padding: 20px; }
-        h2 { color: #2c3e50; }
+        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f9;}
+        .container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); overflow-x: auto; }
+        h2 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;}
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        th { background-color: #2980b9; color: white; }
-        tr:nth-child(even) { background-color: #f2f2f2; }
-        .status-pending { color: orange; font-weight: bold; }
-        .status-selesai { color: green; font-weight: bold; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; font-size: 14px;}
+        th { background-color: #2980b9; color: white; white-space: nowrap;}
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        tr:hover { background-color: #f1f1f1; }
+        .status-pending { color: #d35400; font-weight: bold; background: #fdebd0; padding: 3px 8px; border-radius: 4px; }
+        .status-selesai { color: #27ae60; font-weight: bold; background: #eaeded; padding: 3px 8px; border-radius: 4px; }
+        .btn-wa { background-color: #25D366; color: white; padding: 5px 10px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 12px;}
     </style>
 </head>
 <body>
 
-    <h2>Daftar Antrean Reservasi Pasien</h2>
-    <p>Data langsung dari Google Spreadsheet.</p>
+    <div class="container">
+        <h2>📋 Daftar Antrean Pasien</h2>
+        <p>Data tersinkronisasi otomatis dari Google Spreadsheet.</p>
 
-    <table>
-        <thead>
-            <tr>
-                <th>ID Booking</th>
-                <th>Tgl Bekam</th>
-                <th>Jam</th>
-                <th>Nama Pasien</th>
-                <th>No. WhatsApp</th>
-                <th>Keluhan</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody id="tabelData">
-            <tr><td colspan="7" style="text-align: center;">Memuat data...</td></tr>
-        </tbody>
-    </table>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID Booking</th>
+                    <th>Tgl Bekam</th>
+                    <th>Jam</th>
+                    <th>Nama Pasien</th>
+                    <th>WhatsApp</th>
+                    <th>Keluhan</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="tabelData">
+                <tr><td colspan="7" style="text-align: center; padding: 20px;">Memuat data dari server... ⏳</td></tr>
+            </tbody>
+        </table>
+    </div>
 
     <script>
-        // GANTI DENGAN URL WEB APP APPS SCRIPT ANDA
+        // URL Web App GAS Anda ditambah parameter GET
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz0UPb8fuwA8PqaqFgpjOjgsyDbCsFO_TGci1pILKwYcndfxRZLIIOyqu4HqnHdSVqe7w/exec?action=getReservasi';
 
-        fetch(APPS_SCRIPT_URL)
-            .then(response => response.json())
-            .then(result => {
-                const tbody = document.getElementById('tabelData');
-                tbody.innerHTML = ""; // Bersihkan tulisan "Memuat data..."
+        function muatData() {
+            fetch(APPS_SCRIPT_URL)
+                .then(response => response.json())
+                .then(result => {
+                    const tbody = document.getElementById('tabelData');
+                    tbody.innerHTML = ""; 
 
-                if(result.status === "success" && result.data.length > 0) {
-                    result.data.forEach(row => {
-                        let statusClass = row.status.toLowerCase() === 'pending' ? 'status-pending' : 'status-selesai';
+                    if(result.status === "success" && result.data.length > 0) {
+                        // Membalik urutan agar data terbaru ada di paling atas
+                        const reversedData = result.data.reverse();
                         
-                        let tr = `<tr>
-                            <td>${row.id}</td>
-                            <td>${new Date(row.tanggal).toLocaleDateString('id-ID')}</td>
-                            <td>${row.jam}</td>
-                            <td>${row.nama}</td>
-                            <td><a href="https://wa.me/62${row.no_wa.substring(1)}" target="_blank">${row.no_wa}</a></td>
-                            <td>${row.keluhan}</td>
-                            <td class="${statusClass}">${row.status}</td>
-                        </tr>`;
-                        tbody.innerHTML += tr;
-                    });
-                } else {
-                    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center;">Belum ada data reservasi.</td></tr>`;
-                }
-            })
-            .catch(error => {
-                document.getElementById('tabelData').innerHTML = `<tr><td colspan="7" style="text-align: center; color: red;">Gagal memuat data.</td></tr>`;
-            });
+                        reversedData.forEach(row => {
+                            let statusClass = row.status.toLowerCase() === 'pending' ? 'status-pending' : 'status-selesai';
+                            
+                            // Format Tanggal (menghindari error timezone js)
+                            let tglFormat = row.tanggal ? new Date(row.tanggal).toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'}) : '-';
+                            
+                            // Format Nomor WA (mengganti 0 dengan 62)
+                            let waLink = row.no_wa.toString();
+                            if(waLink.startsWith('0')) { waLink = '62' + waLink.substring(1); }
+
+                            let tr = `<tr>
+                                <td style="color: #7f8c8d; font-size: 12px;">${row.id}</td>
+                                <td><strong>${tglFormat}</strong></td>
+                                <td>${row.jam}</td>
+                                <td>${row.nama}</td>
+                                <td><a href="https://wa.me/${waLink}" target="_blank" class="btn-wa">Chat WA</a></td>
+                                <td>${row.keluhan}</td>
+                                <td><span class="${statusClass}">${row.status}</span></td>
+                            </tr>`;
+                            tbody.innerHTML += tr;
+                        });
+                    } else {
+                        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 20px;">Belum ada data reservasi pasien.</td></tr>`;
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('tabelData').innerHTML = `<tr><td colspan="7" style="text-align: center; color: red; padding: 20px;">❌ Gagal memuat data. Pastikan URL API benar dan Deploy diatur ke 'Anyone'.</td></tr>`;
+                });
+        }
+
+        // Panggil fungsi saat halaman dimuat
+        muatData();
     </script>
 </body>
 </html>
