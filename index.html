@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reservasi Rumah Bekam Monggang</title>
+    <title>Rumah Bekam Monggang</title>
     <style>
         body { font-family: Arial, sans-serif; padding: 20px; max-width: 500px; margin: auto; }
         h2 { text-align: center; color: #2c3e50; }
@@ -36,8 +36,11 @@
             <label>Pilih Jam</label>
             <select id="jam" required>
                 <option value="09:00">09:00 WIB</option>
-                <option value="13:00">13:00 WIB</option>
-                <option value="16:00">16:00 WIB</option>
+                <option value="13:00">11:00 WIB</option>
+                <option value="16:00">13:00 WIB</option>
+                <option value="09:00">15:00 WIB</option>
+                <option value="13:00">17:00 WIB</option>
+                <option value="16:00">19:00 WIB</option>
             </select>
         </div>
         <div class="form-group">
@@ -51,7 +54,7 @@
 
     <script>
         // GANTI URL DI BAWAH INI DENGAN URL WEB APP APPS SCRIPT ANDA
-        const APPS_SCRIPT_URL = 'MASUKKAN_URL_WEB_APP_ANDA_DI_SINI';
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz0UPb8fuwA8PqaqFgpjOjgsyDbCsFO_TGci1pILKwYcndfxRZLIIOyqu4HqnHdSVqe7w/exec';
 
         document.getElementById('bookingForm').addEventListener('submit', function(e) {
             e.preventDefault();
