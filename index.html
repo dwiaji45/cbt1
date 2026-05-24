@@ -7,19 +7,30 @@
     <link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/1RJkvv-OsdOchFl2L-oimzZpHAOzoPAZr">
     <style>
         body { font-family: Arial, sans-serif; padding: 20px; max-width: 500px; margin: auto; background-color: #f9f9f9;}
-        h2 { text-align: center; color: #2c3e50; }
-        .form-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        
+        /* Styling Form */
+        .form-container { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        
+        /* Styling Logo */
+        .logo-container { text-align: center; margin-bottom: 10px; }
+        .logo-container img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid #27ae60; padding: 2px;}
+        
+        h2 { text-align: center; color: #2c3e50; margin-top: 5px; margin-bottom: 20px;}
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px;}
         input, textarea, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
         button { width: 100%; padding: 12px; background-color: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold;}
         button:hover { background-color: #2ecc71; }
-        #pesan { margin-top: 15px; text-align: center; font-weight: bold; }
+        #pesan { margin-top: 15px; text-align: center; font-weight: bold; font-size: 14px; }
     </style>
 </head>
 <body>
 
     <div class="form-container">
+        <div class="logo-container">
+            <img src="https://lh3.googleusercontent.com/d/1RJkvv-OsdOchFl2L-oimzZpHAOzoPAZr" alt="Logo Rumah Bekam Monggang">
+        </div>
+
         <h2>Form Reservasi Bekam</h2>
         
         <form id="bookingForm">
@@ -55,8 +66,17 @@
     </div>
 
     <script>
-        // URL Web App GAS Anda
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz0UPb8fuwA8PqaqFgpjOjgsyDbCsFO_TGci1pILKwYcndfxRZLIIOyqu4HqnHdSVqe7w/exec';
+        
+        // Nomor WhatsApp Admin Tujuan (Ubah dengan nomor asli Anda, gunakan awalan 62)
+        const NOMOR_WA_ADMIN = "62859148395363"; 
+
+        // Fungsi mengubah tanggal "YYYY-MM-DD" menjadi format "Senin, 25 Mei 2026"
+        function formatTanggalIndo(tanggalString) {
+            const dateObj = new Date(tanggalString);
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            return dateObj.toLocaleDateString('id-ID', options);
+        }
 
         document.getElementById('bookingForm').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -64,16 +84,23 @@
             const btnSubmit = document.getElementById('btnSubmit');
             const pesan = document.getElementById('pesan');
             
-            btnSubmit.innerText = "Mengirim...";
+            // Ambil data dari input form
+            const inputNama = document.getElementById('nama').value;
+            const inputNoWA = document.getElementById('no_wa').value;
+            const inputTanggal = document.getElementById('tanggal').value;
+            const inputJam = document.getElementById('jam').value;
+            const inputKeluhan = document.getElementById('keluhan').value;
+
+            btnSubmit.innerText = "Mengirim Data...";
             btnSubmit.disabled = true;
 
             const data = {
                 action: "booking",
-                nama: document.getElementById('nama').value,
-                no_wa: document.getElementById('no_wa').value,
-                tanggal: document.getElementById('tanggal').value,
-                jam: document.getElementById('jam').value,
-                keluhan: document.getElementById('keluhan').value
+                nama: inputNama,
+                no_wa: inputNoWA,
+                tanggal: inputTanggal,
+                jam: inputJam,
+                keluhan: inputKeluhan
             };
 
             fetch(APPS_SCRIPT_URL, {
@@ -84,7 +111,19 @@
             .then(result => {
                 if(result.status === "success") {
                     pesan.style.color = "green";
-                    pesan.innerText = "✅ Reservasi berhasil! Kami akan menghubungi Anda segera.";
+                    pesan.innerText = "✅ Reservasi tersimpan! Mengarahkan ke WhatsApp...";
+                    
+                    // --- PROSES KIRIM WA OTOMATIS ---
+                    const tanggalFormat = formatTanggalIndo(inputTanggal);
+                    
+                    // Susunan Teks WA
+                    const textPesan = `Assalamu'alaikum / Halo Admin Rumah Bekam Monggang, 🙏\n\nSaya telah mengisi form reservasi di website. Berikut adalah detail jadwal saya:\n\n*Nama Lengkap* : ${inputNama}\n*Nomor WhatsApp* : ${inputNoWA}\n*Tanggal Bekam* : ${tanggalFormat}\n*Pilih Jam* : ${inputJam} WIB - Selesai\n*Keluhan Utama* : ${inputKeluhan}\n\nTerima kasih, saya menunggu konfirmasi lebih lanjut dari Admin nggih.`;
+                    
+                    // Buat Link WA dan buka di Tab Baru
+                    const urlWA = `https://wa.me/${NOMOR_WA_ADMIN}?text=${encodeURIComponent(textPesan)}`;
+                    window.open(urlWA, '_blank');
+
+                    // Bersihkan form
                     document.getElementById('bookingForm').reset();
                 } else {
                     pesan.style.color = "red";
@@ -101,96 +140,5 @@
             });
         });
     </script>
-<style>
-    /* Styling Chatbot */
-    .chat-btn { position: fixed; bottom: 20px; right: 20px; background-color: #2c3e50; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.2); font-size: 24px; z-index: 1000; transition: transform 0.3s;}
-    .chat-btn:hover { transform: scale(1.1); }
-    .chat-window { position: fixed; bottom: 90px; right: 20px; width: 320px; height: 400px; background: white; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); display: none; flex-direction: column; z-index: 1000; overflow: hidden;}
-    .chat-header { background: #2c3e50; color: white; padding: 15px; font-weight: bold; display: flex; align-items: center; justify-content: space-between;}
-    .chat-header img { width: 30px; height: 30px; border-radius: 50%; margin-right: 10px; background: white;}
-    .chat-header-title { display: flex; align-items: center; }
-    .close-chat { cursor: pointer; font-size: 18px; }
-    .chat-body { flex: 1; padding: 15px; overflow-y: auto; background: #f9f9f9; display: flex; flex-direction: column; gap: 10px;}
-    .chat-msg { padding: 10px; border-radius: 8px; font-size: 14px; max-width: 80%; line-height: 1.4;}
-    .msg-bot { background: #eef2f7; color: #333; align-self: flex-start; border-bottom-left-radius: 0;}
-    .msg-user { background: #27ae60; color: white; align-self: flex-end; border-bottom-right-radius: 0;}
-    .chat-footer { padding: 10px; background: white; border-top: 1px solid #ddd; display: flex; gap: 5px;}
-    .chat-footer input { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 20px; outline: none; }
-    .chat-footer button { width: 40px; border-radius: 50%; background: #2c3e50; padding: 0; display: flex; justify-content: center; align-items: center;}
-</style>
-
-<div class="chat-btn" onclick="toggleChat()">💬</div>
-
-<div class="chat-window" id="chatWindow">
-    <div class="chat-header">
-        <div class="chat-header-title">
-            <img src="https://lh3.googleusercontent.com/d/1RJkvv-OsdOchFl2L-oimzZpHAOzoPAZr" alt="Logo"> Asisten Monggang
-        </div>
-        <div class="close-chat" onclick="toggleChat()">✖</div>
-    </div>
-    <div class="chat-body" id="chatBody">
-        <div class="chat-msg msg-bot">Sugeng rawuh! Ada yang bisa kami bantu seputar layanan Rumah Bekam Monggang?</div>
-    </div>
-    <div class="chat-footer">
-        <input type="text" id="chatInput" placeholder="Ketik pertanyaan...">
-        <button onclick="kirimPesan()">➤</button>
-    </div>
-</div>
-
-<script>
-    function toggleChat() {
-        const chatWin = document.getElementById('chatWindow');
-        chatWin.style.display = (chatWin.style.display === 'flex') ? 'none' : 'flex';
-    }
-
-    function kirimPesan() {
-        const input = document.getElementById('chatInput');
-        const pesan = input.value.trim();
-        if(!pesan) return;
-
-        tambahBubble(pesan, 'user');
-        input.value = "";
-        
-        // Indikator loading
-        const loadingId = "load-" + Date.now();
-        tambahBubble("Mengetik...", 'bot', loadingId);
-
-        fetch(APPS_SCRIPT_URL, {
-            method: 'POST',
-            body: JSON.stringify({ action: "chat", message: pesan })
-        })
-        .then(res => res.json())
-        .then(result => {
-            document.getElementById(loadingId).remove();
-            if(result.status === "success") {
-                tambahBubble(result.data.reply, 'bot');
-            } else {
-                tambahBubble("Maaf, terjadi kesalahan koneksi.", 'bot');
-            }
-            scrollKeBawah();
-        }).catch(err => {
-            document.getElementById(loadingId).remove();
-            tambahBubble("Maaf, jaringan sedang bermasalah.", 'bot');
-        });
-    }
-
-    function tambahBubble(teks, sender, id = null) {
-        const chatBody = document.getElementById('chatBody');
-        const div = document.createElement('div');
-        div.className = `chat-msg msg-${sender}`;
-        if(id) div.id = id;
-        
-        // Konversi newline (\n) menjadi <br> agar rapi
-        div.innerHTML = teks.replace(/\n/g, '<br>'); 
-        
-        chatBody.appendChild(div);
-        scrollKeBawah();
-    }
-
-    function scrollKeBawah() {
-        const chatBody = document.getElementById('chatBody');
-        chatBody.scrollTop = chatBody.scrollHeight;
-    }
-</script>
 </body>
 </html>
