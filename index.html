@@ -117,7 +117,7 @@
                     const tanggalFormat = formatTanggalIndo(inputTanggal);
                     
                     // Susunan Teks WA
-                    const textPesan = `Assalamu'alaikum / Halo Admin Rumah Bekam Monggang, 🙏\n\nSaya telah mengisi form reservasi di website. Berikut adalah detail jadwal saya:\n\n*Nama Lengkap* : ${inputNama}\n*Nomor WhatsApp* : ${inputNoWA}\n*Tanggal Bekam* : ${tanggalFormat}\n*Pilih Jam* : ${inputJam} WIB - Selesai\n*Keluhan Utama* : ${inputKeluhan}\n\nTerima kasih, saya menunggu konfirmasi lebih lanjut dari Admin nggih.`;
+                    const textPesan = `Assalamu'alaikum Rumah Bekam Monggang, 🙏\n\nSaya telah mengisi form. Berikut adalah detail jadwal saya:\n\n*Nama Lengkap* : ${inputNama}\n*Nomor WhatsApp* : ${inputNoWA}\n*Tanggal Bekam* : ${tanggalFormat}\n*Pilih Jam* : ${inputJam} WIB - Selesai\n*Keluhan Utama* : ${inputKeluhan}\n\nTerima kasih, saya menunggu konfirmasi lebih lanjut dari Admin nggih.`;
                     
                     // Buat Link WA dan buka di Tab Baru
                     const urlWA = `https://wa.me/${NOMOR_WA_ADMIN}?text=${encodeURIComponent(textPesan)}`;
