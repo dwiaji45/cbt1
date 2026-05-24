@@ -7,9 +7,16 @@
     <style>
         body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f9; color: #333;}
         .container { max-width: 1100px; margin: auto; }
-        h2 { color: #2c3e50; border-bottom: 2px solid #2980b9; padding-bottom: 10px; margin-bottom: 20px;}
         
-        /* STYLE KARTU INDIKATOR DASBOR */
+        /* TAMPILAN LOGIN PIN */
+        #login-section { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); max-width: 400px; margin: 100px auto; text-align: center; }
+        #login-section input { width: 100%; padding: 12px; margin: 15px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        #login-section button { width: 100%; padding: 12px; background-color: #2980b9; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        
+        /* TAMPILAN DASHBOARD (Disembunyikan di awal) */
+        #dashboard-section { display: none; }
+        
+        h2 { color: #2c3e50; border-bottom: 2px solid #2980b9; padding-bottom: 10px; margin-bottom: 20px;}
         .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
         .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-left: 5px solid #ccc; }
         .card.total { border-left-color: #2980b9; }
@@ -17,40 +24,41 @@
         .card.selesai { border-left-color: #2ecc71; }
         .card-title { font-size: 13px; text-transform: uppercase; color: #7f8c8d; font-weight: bold; margin-bottom: 5px;}
         .card-value { font-size: 32px; font-weight: bold; color: #2c3e50; }
-
-        /* STYLE TABEL */
         .table-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { border: 1px solid #eee; padding: 12px; text-align: left; font-size: 14px;}
         th { background-color: #2980b9; color: white; white-space: nowrap;}
         tr:nth-child(even) { background-color: #fbfbfb; }
-        tr:hover { background-color: #f5f6fa; }
-        
-        /* BADGE STATUS */
         .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; text-transform: uppercase; display: inline-block;}
         .status-pending { color: #d35400; background: #fdebd0; }
         .status-selesai { color: #27ae60; background: #d5f5e3; }
-        
         .btn-wa { background-color: #25D366; color: white; padding: 6px 12px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 12px; display: inline-block;}
-        .btn-wa:hover { background-color: #20ba5a; }
     </style>
 </head>
 <body>
 
-    <div class="container">
+    <div id="login-section">
+        <h2>🔒 Akses Admin</h2>
+        <p style="font-size: 14px; color: #666;">Masukkan Token Keamanan untuk mengakses data pasien.</p>
+        <input type="password" id="inputToken" placeholder="Masukkan Token...">
+        <button onclick="cekToken()">Buka Dasbor</button>
+        <p id="pesanLogin" style="color: red; font-size: 14px; margin-top: 10px;"></p>
+    </div>
+
+    <div class="container" id="dashboard-section">
         <h2>📋 Kontrol Panel & Antrean Pasien</h2>
         
         <div class="dashboard-grid">
             <div class="card total">
-                <div class="card-title">Total Pasien Terdaftar</div>
+                <div class="card-title">Total Pasien</div>
                 <div class="card-value" id="countTotal">0</div>
             </div>
             <div class="card pending">
-                <div class="card-title">Menunggu Konfirmasi (Pending)</div>
+                <div class="card-title">Pending</div>
                 <div class="card-value" id="countPending" style="color: #e67e22;">0</div>
             </div>
             <div class="card selesai">
-                <div class="card-title">Selesai Dibekam</div>
+                <div class="card-title">Selesai</div>
                 <div class="card-value" id="countSelesai" style="color: #2ecc71;">0</div>
             </div>
         </div>
@@ -59,87 +67,113 @@
             <table id="data-table">
                 <thead>
                     <tr>
-                        <th>ID Booking</th>
                         <th>Tgl Bekam</th>
                         <th>Jam</th>
                         <th>Nama Pasien</th>
                         <th>WhatsApp</th>
                         <th>Keluhan</th>
-                        <th>Status Konfirmasi</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody id="tabelData">
-                    <tr><td colspan="7" style="text-align: center; padding: 25px;">Menghubungkan ke server aman... 🔐</td></tr>
+                    <tr><td colspan="6" style="text-align: center; padding: 25px;">Memuat data... ⏳</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 
     <script>
-        // URL Web App GAS dengan penambahan parameter Token Keamanan
         const BASE_URL = 'https://script.google.com/macros/s/AKfycbz0UPb8fuwA8PqaqFgpjOjgsyDbCsFO_TGci1pILKwYcndfxRZLIIOyqu4HqnHdSVqe7w/exec';
-        const TOKEN = 'MonggangSecure2026'; // Harus sama persis dengan yang ada di Code.gs
-        const APPS_SCRIPT_URL = `${BASE_URL}?action=getReservasi&token=${TOKEN}`;
 
-        function muatData() {
-            fetch(APPS_SCRIPT_URL)
+        function cekToken() {
+            const tokenInput = document.getElementById('inputToken').value;
+            const pesanLogin = document.getElementById('pesanLogin');
+            const btn = document.querySelector('#login-section button');
+            
+            if(!tokenInput) {
+                pesanLogin.innerText = "Token tidak boleh kosong!";
+                return;
+            }
+
+            btn.innerText = "Memverifikasi...";
+            btn.disabled = true;
+            pesanLogin.innerText = "";
+
+            // Menyisipkan token yang diketik ke dalam URL fetch
+            const FETCH_URL = `${BASE_URL}?action=getReservasi&token=${tokenInput}`;
+
+            fetch(FETCH_URL)
                 .then(response => response.json())
                 .then(result => {
-                    const tbody = document.getElementById('tabelData');
-                    tbody.innerHTML = ""; 
-
-                    if(result.status === "success" && result.data.length > 0) {
-                        const reversedData = result.data.reverse();
-                        
-                        // Variabel Penghitung untuk Dasbor
-                        let totalPasien = reversedData.length;
-                        let totalPending = 0;
-                        let totalSelesai = 0;
-                        
-                        reversedData.forEach(row => {
-                            // Hitung status secara dinamis
-                            let currentStatus = row.status ? row.status.trim().toLowerCase() : 'pending';
-                            if (currentStatus === 'pending') { totalPending++; } 
-                            else if (currentStatus === 'selesai') { totalSelesai++; }
-
-                            // Penentuan Class Badge
-                            let statusBadgeClass = currentStatus === 'pending' ? 'status-pending' : 'status-selesai';
-                            
-                            // Format Tanggal
-                            let tglFormat = row.tanggal ? new Date(row.tanggal).toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'}) : '-';
-                            
-                            // Format Nomor WA
-                            let waLink = row.no_wa ? row.no_wa.toString() : '';
-                            if(waLink.startsWith('0')) { waLink = '62' + waLink.substring(1); }
-
-                            let tr = `<tr>
-                                <td style="color: #95a5a6; font-size: 11px; font-family: monospace;">${row.id}</td>
-                                <td><strong>${tglFormat}</strong></td>
-                                <td><span style="background: #eef2f7; padding: 3px 6px; border-radius: 4px; font-weight: bold;">${row.jam || '-'}</span></td>
-                                <td>${row.nama}</td>
-                                <td><a href="https://wa.me/${waLink}" target="_blank" class="btn-wa">💬 Chat Admin</a></td>
-                                <td style="max-width: 250px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;" title="${row.keluhan}">${row.keluhan}</td>
-                                <td><span class="status-badge ${statusBadgeClass}">${row.status || 'Pending'}</span></td>
-                            </tr>`;
-                            tbody.innerHTML += tr;
-                        });
-
-                        // Suntikkan angka hasil hitungan ke kartu dasbor atas
-                        document.getElementById('countTotal').innerText = totalPasien;
-                        document.getElementById('countPending').innerText = totalPending;
-                        document.getElementById('countSelesai').innerText = totalSelesai;
-
+                    if(result.status === "success") {
+                        // Jika berhasil, sembunyikan login dan tampilkan dasbor
+                        document.getElementById('login-section').style.display = 'none';
+                        document.getElementById('dashboard-section').style.display = 'block';
+                        tampilkanData(result.data);
                     } else {
-                        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 20px;">Belum ada data reservasi pasien.</td></tr>`;
+                        // Jika token salah, tampilkan pesan error dari GAS
+                        pesanLogin.innerText = "❌ " + result.message;
+                        btn.innerText = "Buka Dasbor";
+                        btn.disabled = false;
                     }
                 })
                 .catch(error => {
-                    document.getElementById('tabelData').innerHTML = `<tr><td colspan="7" style="text-align: center; color: red; padding: 20px;">❌ Gagal memuat data aman. Pastikan token sinkron dan konfigurasi deploy sudah 'Anyone'.</td></tr>`;
+                    pesanLogin.innerText = "❌ Gagal terhubung ke server.";
+                    btn.innerText = "Buka Dasbor";
+                    btn.disabled = false;
                 });
         }
 
-        // Jalankan saat halaman dibuka
-        muatData();
+        function tampilkanData(dataArray) {
+            const tbody = document.getElementById('tabelData');
+            tbody.innerHTML = ""; 
+
+            if(dataArray.length > 0) {
+                const reversedData = dataArray.reverse();
+                
+                let totalPasien = reversedData.length;
+                let totalPending = 0;
+                let totalSelesai = 0;
+                
+                reversedData.forEach(row => {
+                    // PERBAIKAN BUG UNDEFINED: Membaca huruf besar atau kecil dari Spreadsheet
+                    let nama = row.Nama || row.nama || row.NAMA || '-';
+                    let keluhan = row.Keluhan || row.keluhan || row.KELUHAN || '-';
+                    let no_wa = row['No WA'] || row.no_wa || row.hp || row.HP || '';
+                    let tanggal = row.Tanggal || row.tanggal || '';
+                    let jam = row.Jam || row.jam || '-';
+                    let status = row.Status || row.status || 'Pending';
+
+                    let currentStatus = status.trim().toLowerCase();
+                    if (currentStatus === 'pending' || currentStatus === 'menunggu konfirmasi') { totalPending++; } 
+                    else { totalSelesai++; }
+
+                    let statusBadgeClass = (currentStatus === 'pending' || currentStatus === 'menunggu konfirmasi') ? 'status-pending' : 'status-selesai';
+                    
+                    let tglFormat = tanggal ? new Date(tanggal).toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'}) : '-';
+                    
+                    let waLink = no_wa.toString();
+                    if(waLink.startsWith('0')) { waLink = '62' + waLink.substring(1); }
+
+                    let tr = `<tr>
+                        <td><strong>${tglFormat}</strong></td>
+                        <td><span style="background: #eef2f7; padding: 3px 6px; border-radius: 4px; font-weight: bold;">${jam}</span></td>
+                        <td>${nama}</td>
+                        <td><a href="https://wa.me/${waLink}" target="_blank" class="btn-wa">💬 Chat</a></td>
+                        <td style="max-width: 200px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;" title="${keluhan}">${keluhan}</td>
+                        <td><span class="status-badge ${statusBadgeClass}">${status}</span></td>
+                    </tr>`;
+                    tbody.innerHTML += tr;
+                });
+
+                document.getElementById('countTotal').innerText = totalPasien;
+                document.getElementById('countPending').innerText = totalPending;
+                document.getElementById('countSelesai').innerText = totalSelesai;
+
+            } else {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 20px;">Belum ada data reservasi pasien.</td></tr>`;
+            }
+        }
     </script>
 </body>
 </html>
