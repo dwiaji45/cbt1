@@ -4,24 +4,145 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reservasi Rumah Bekam Monggang</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/1RJkvv-OsdOchFl2L-oimzZpHAOzoPAZr">
+    
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; max-width: 500px; margin: auto; background-color: #f9f9f9;}
+        /* Desain Dasar */
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background: #f0f4f8; /* Warna background lebih lembut */
+            margin: 0; 
+            padding: 30px 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
         
-        /* Styling Form */
-        .form-container { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        /* Desain Container/Card */
+        .form-container { 
+            background: white; 
+            padding: 35px 30px; 
+            border-radius: 16px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
+            width: 100%;
+            max-width: 450px;
+            box-sizing: border-box;
+        }
         
-        /* Styling Logo */
-        .logo-container { text-align: center; margin-bottom: 10px; }
-        .logo-container img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid #27ae60; padding: 2px;}
+        /* Area Logo */
+        .logo-container { text-align: center; margin-bottom: 15px; }
+        .logo-container img { 
+            width: 90px; 
+            height: 90px; 
+            border-radius: 50%; 
+            object-fit: cover; 
+            border: 3px solid #e2e8f0; 
+            padding: 3px;
+            transition: transform 0.3s ease;
+        }
+        .logo-container img:hover { transform: scale(1.05); }
         
-        h2 { text-align: center; color: #2c3e50; margin-top: 5px; margin-bottom: 20px;}
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px;}
-        input, textarea, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background-color: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold;}
-        button:hover { background-color: #2ecc71; }
-        #pesan { margin-top: 15px; text-align: center; font-weight: bold; font-size: 14px; }
+        /* Tipografi Judul */
+        h2 { 
+            text-align: center; 
+            color: #1e293b; 
+            margin-top: 0; 
+            margin-bottom: 25px;
+            font-size: 22px;
+            font-weight: 600;
+        }
+        
+        /* Desain Kolom Input */
+        .form-group { margin-bottom: 18px; }
+        label { 
+            display: block; 
+            margin-bottom: 6px; 
+            font-weight: 500; 
+            font-size: 13px;
+            color: #475569;
+        }
+        input, textarea, select { 
+            width: 100%; 
+            padding: 12px 15px; 
+            border: 1.5px solid #cbd5e1; 
+            border-radius: 10px; 
+            box-sizing: border-box; 
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            color: #334155;
+            background-color: #f8fafc;
+            transition: all 0.3s ease;
+        }
+        
+        /* Efek saat input diklik */
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #27ae60;
+            background-color: white;
+            box-shadow: 0 0 0 4px rgba(39, 174, 96, 0.1);
+        }
+
+        /* Desain Tombol */
+        button { 
+            width: 100%; 
+            padding: 14px; 
+            background: linear-gradient(135deg, #27ae60, #229954); 
+            color: white; 
+            border: none; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            font-size: 15px; 
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            box-shadow: 0 4px 10px rgba(39, 174, 96, 0.3);
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px; /* Jarak antara teks dan spinner */
+        }
+        button:hover { 
+            background: linear-gradient(135deg, #229954, #1e8449); 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(39, 174, 96, 0.4);
+        }
+        button:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        /* Animasi Loading (Spinner) */
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            display: none; /* Disembunyikan secara default */
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Desain Pesan Sukses/Gagal */
+        #pesan { 
+            margin-top: 15px; 
+            text-align: center; 
+            font-weight: 500; 
+            font-size: 13px; 
+            padding: 10px;
+            border-radius: 8px;
+            display: none; /* Disembunyikan sebelum ada aksi */
+        }
+        .pesan-sukses { background-color: #d1fae5; color: #065f46; display: block !important; }
+        .pesan-error { background-color: #fee2e2; color: #b91c1c; display: block !important; }
+
     </style>
 </head>
 <body>
@@ -31,16 +152,16 @@
             <img src="https://lh3.googleusercontent.com/d/1RJkvv-OsdOchFl2L-oimzZpHAOzoPAZr" alt="Logo Rumah Bekam Monggang">
         </div>
 
-        <h2>Form Rumah Bekam Monggang</h2>
+        <h2>Form Reservasi Bekam</h2>
         
         <form id="bookingForm">
             <div class="form-group">
                 <label>Nama Lengkap</label>
-                <input type="text" id="nama" required>
+                <input type="text" id="nama" placeholder="Masukkan nama Anda" required>
             </div>
             <div class="form-group">
-                <label>Nomor WhatsApp (Contoh: 0812...)</label>
-                <input type="number" id="no_wa" required>
+                <label>Nomor WhatsApp</label>
+                <input type="number" id="no_wa" placeholder="Contoh: 08123456789" required>
             </div>
             <div class="form-group">
                 <label>Tanggal Bekam</label>
@@ -59,7 +180,11 @@
                 <label>Keluhan Utama</label>
                 <textarea id="keluhan" rows="3" required placeholder="Misal: Pegal-pegal, tensi tinggi, kolesterol..."></textarea>
             </div>
-            <button type="submit" id="btnSubmit">Kirim Reservasi</button>
+            
+            <button type="submit" id="btnSubmit">
+                <div class="spinner" id="loadingSpinner"></div>
+                <span id="btnText">Kirim Reservasi</span>
+            </button>
         </form>
 
         <div id="pesan"></div>
@@ -67,11 +192,8 @@
 
     <script>
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz0UPb8fuwA8PqaqFgpjOjgsyDbCsFO_TGci1pILKwYcndfxRZLIIOyqu4HqnHdSVqe7w/exec';
-        
-        // Nomor WhatsApp Admin Tujuan (Ubah dengan nomor asli Anda, gunakan awalan 62)
         const NOMOR_WA_ADMIN = "62859148395363"; 
 
-        // Fungsi mengubah tanggal "YYYY-MM-DD" menjadi format "Senin, 25 Mei 2026"
         function formatTanggalIndo(tanggalString) {
             const dateObj = new Date(tanggalString);
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -82,17 +204,24 @@
             e.preventDefault();
             
             const btnSubmit = document.getElementById('btnSubmit');
+            const btnText = document.getElementById('btnText');
+            const spinner = document.getElementById('loadingSpinner');
             const pesan = document.getElementById('pesan');
             
-            // Ambil data dari input form
             const inputNama = document.getElementById('nama').value;
             const inputNoWA = document.getElementById('no_wa').value;
             const inputTanggal = document.getElementById('tanggal').value;
             const inputJam = document.getElementById('jam').value;
             const inputKeluhan = document.getElementById('keluhan').value;
 
-            btnSubmit.innerText = "Mengirim Data...";
+            // --- TAMPILKAN ANIMASI LOADING ---
+            btnText.innerText = "Memproses Data...";
+            spinner.style.display = "block";
             btnSubmit.disabled = true;
+            
+            // Reset kotak pesan
+            pesan.className = "";
+            pesan.innerText = "";
 
             const data = {
                 action: "booking",
@@ -110,32 +239,31 @@
             .then(response => response.json())
             .then(result => {
                 if(result.status === "success") {
-                    pesan.style.color = "green";
-                    pesan.innerText = "✅ Reservasi tersimpan! Mengarahkan ke WhatsApp...";
+                    pesan.className = "pesan-sukses";
+                    pesan.innerText = "✅ Berhasil! Mengarahkan ke WhatsApp...";
                     
-                    // --- PROSES KIRIM WA OTOMATIS ---
                     const tanggalFormat = formatTanggalIndo(inputTanggal);
+                    const textPesan = `Assalamu'alaikum Rumah Bekam Monggang, 🙏\n\nSaya telah mengisi form reservasi di website. Berikut detail jadwal saya:\n\n*Nama* : ${inputNama}\n*No. WA* : ${inputNoWA}\n*Tanggal* : ${tanggalFormat}\n*Jam* : ${inputJam} WIB\n*Keluhan* : ${inputKeluhan}\n\nTerima kasih, saya tunggu konfirmasinya nggih.`;
                     
-                    // Susunan Teks WA
-                    const textPesan = `Assalamu'alaikum Rumah Bekam Monggang, 🙏\n\nSaya telah mengisi form. Berikut adalah detail jadwal saya:\n\n*Nama Lengkap* : ${inputNama}\n*Nomor WhatsApp* : ${inputNoWA}\n*Tanggal Bekam* : ${tanggalFormat}\n*Pilih Jam* : ${inputJam} WIB - Selesai\n*Keluhan Utama* : ${inputKeluhan}\n\nTerima kasih, saya menunggu konfirmasi lebih lanjut dari Admin nggih.`;
-                    
-                    // Buat Link WA dan buka di Tab Baru
-                    const urlWA = `https://wa.me/${NOMOR_WA_ADMIN}?text=${encodeURIComponent(textPesan)}`;
-                    window.open(urlWA, '_blank');
+                    setTimeout(() => {
+                        window.open(`https://wa.me/${NOMOR_WA_ADMIN}?text=${encodeURIComponent(textPesan)}`, '_blank');
+                        document.getElementById('bookingForm').reset();
+                        pesan.className = ""; // Sembunyikan pesan sukses setelah dialihkan
+                    }, 1500); // Beri jeda 1,5 detik agar user sempat membaca tulisan sukses
 
-                    // Bersihkan form
-                    document.getElementById('bookingForm').reset();
                 } else {
-                    pesan.style.color = "red";
-                    pesan.innerText = "❌ Terjadi kesalahan backend. Coba lagi.";
+                    pesan.className = "pesan-error";
+                    pesan.innerText = "❌ Terjadi kesalahan. Coba lagi.";
                 }
             })
             .catch(error => {
-                pesan.style.color = "red";
+                pesan.className = "pesan-error";
                 pesan.innerText = "❌ Gagal terhubung ke server.";
             })
             .finally(() => {
-                btnSubmit.innerText = "Kirim Reservasi";
+                // --- KEMBALIKAN TOMBOL SEPERTI SEMULA ---
+                btnText.innerText = "Kirim Reservasi";
+                spinner.style.display = "none";
                 btnSubmit.disabled = false;
             });
         });
