@@ -5,46 +5,81 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Admin - Rumah Bekam Monggang</title>
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f9;}
-        .container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); overflow-x: auto; }
-        h2 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;}
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; font-size: 14px;}
+        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f9; color: #333;}
+        .container { max-width: 1100px; margin: auto; }
+        h2 { color: #2c3e50; border-bottom: 2px solid #2980b9; padding-bottom: 10px; margin-bottom: 20px;}
+        
+        /* STYLE KARTU INDIKATOR DASBOR */
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-left: 5px solid #ccc; }
+        .card.total { border-left-color: #2980b9; }
+        .card.pending { border-left-color: #e67e22; }
+        .card.selesai { border-left-color: #2ecc71; }
+        .card-title { font-size: 13px; text-transform: uppercase; color: #7f8c8d; font-weight: bold; margin-bottom: 5px;}
+        .card-value { font-size: 32px; font-weight: bold; color: #2c3e50; }
+
+        /* STYLE TABEL */
+        .table-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #eee; padding: 12px; text-align: left; font-size: 14px;}
         th { background-color: #2980b9; color: white; white-space: nowrap;}
-        tr:nth-child(even) { background-color: #f9f9f9; }
-        tr:hover { background-color: #f1f1f1; }
-        .status-pending { color: #d35400; font-weight: bold; background: #fdebd0; padding: 3px 8px; border-radius: 4px; }
-        .status-selesai { color: #27ae60; font-weight: bold; background: #eaeded; padding: 3px 8px; border-radius: 4px; }
-        .btn-wa { background-color: #25D366; color: white; padding: 5px 10px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 12px;}
+        tr:nth-child(even) { background-color: #fbfbfb; }
+        tr:hover { background-color: #f5f6fa; }
+        
+        /* BADGE STATUS */
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; text-transform: uppercase; display: inline-block;}
+        .status-pending { color: #d35400; background: #fdebd0; }
+        .status-selesai { color: #27ae60; background: #d5f5e3; }
+        
+        .btn-wa { background-color: #25D366; color: white; padding: 6px 12px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 12px; display: inline-block;}
+        .btn-wa:hover { background-color: #20ba5a; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h2>📋 Daftar Antrean Pasien</h2>
-        <p>Data tersinkronisasi otomatis dari Google Spreadsheet.</p>
+        <h2>📋 Kontrol Panel & Antrean Pasien</h2>
+        
+        <div class="dashboard-grid">
+            <div class="card total">
+                <div class="card-title">Total Pasien Terdaftar</div>
+                <div class="card-value" id="countTotal">0</div>
+            </div>
+            <div class="card pending">
+                <div class="card-title">Menunggu Konfirmasi (Pending)</div>
+                <div class="card-value" id="countPending" style="color: #e67e22;">0</div>
+            </div>
+            <div class="card selesai">
+                <div class="card-title">Selesai Dibekam</div>
+                <div class="card-value" id="countSelesai" style="color: #2ecc71;">0</div>
+            </div>
+        </div>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>ID Booking</th>
-                    <th>Tgl Bekam</th>
-                    <th>Jam</th>
-                    <th>Nama Pasien</th>
-                    <th>WhatsApp</th>
-                    <th>Keluhan</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody id="tabelData">
-                <tr><td colspan="7" style="text-align: center; padding: 20px;">Memuat data dari server... ⏳</td></tr>
-            </tbody>
-        </table>
+        <div class="table-container">
+            <table id="data-table">
+                <thead>
+                    <tr>
+                        <th>ID Booking</th>
+                        <th>Tgl Bekam</th>
+                        <th>Jam</th>
+                        <th>Nama Pasien</th>
+                        <th>WhatsApp</th>
+                        <th>Keluhan</th>
+                        <th>Status Konfirmasi</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelData">
+                    <tr><td colspan="7" style="text-align: center; padding: 25px;">Menghubungkan ke server aman... 🔐</td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <script>
-        // URL Web App GAS Anda ditambah parameter GET
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz0UPb8fuwA8PqaqFgpjOjgsyDbCsFO_TGci1pILKwYcndfxRZLIIOyqu4HqnHdSVqe7w/exec?action=getReservasi';
+        // URL Web App GAS dengan penambahan parameter Token Keamanan
+        const BASE_URL = 'https://script.google.com/macros/s/AKfycbz0UPb8fuwA8PqaqFgpjOjgsyDbCsFO_TGci1pILKwYcndfxRZLIIOyqu4HqnHdSVqe7w/exec';
+        const TOKEN = 'MonggangSecure2026'; // Harus sama persis dengan yang ada di Code.gs
+        const APPS_SCRIPT_URL = `${BASE_URL}?action=getReservasi&token=${TOKEN}`;
 
         function muatData() {
             fetch(APPS_SCRIPT_URL)
@@ -54,40 +89,56 @@
                     tbody.innerHTML = ""; 
 
                     if(result.status === "success" && result.data.length > 0) {
-                        // Membalik urutan agar data terbaru ada di paling atas
                         const reversedData = result.data.reverse();
                         
+                        // Variabel Penghitung untuk Dasbor
+                        let totalPasien = reversedData.length;
+                        let totalPending = 0;
+                        let totalSelesai = 0;
+                        
                         reversedData.forEach(row => {
-                            let statusClass = row.status.toLowerCase() === 'pending' ? 'status-pending' : 'status-selesai';
+                            // Hitung status secara dinamis
+                            let currentStatus = row.status ? row.status.trim().toLowerCase() : 'pending';
+                            if (currentStatus === 'pending') { totalPending++; } 
+                            else if (currentStatus === 'selesai') { totalSelesai++; }
+
+                            // Penentuan Class Badge
+                            let statusBadgeClass = currentStatus === 'pending' ? 'status-pending' : 'status-selesai';
                             
-                            // Format Tanggal (menghindari error timezone js)
+                            // Format Tanggal
                             let tglFormat = row.tanggal ? new Date(row.tanggal).toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'}) : '-';
                             
-                            // Format Nomor WA (mengganti 0 dengan 62)
-                            let waLink = row.no_wa.toString();
+                            // Format Nomor WA
+                            let waLink = row.no_wa ? row.no_wa.toString() : '';
                             if(waLink.startsWith('0')) { waLink = '62' + waLink.substring(1); }
 
                             let tr = `<tr>
-                                <td style="color: #7f8c8d; font-size: 12px;">${row.id}</td>
+                                <td style="color: #95a5a6; font-size: 11px; font-family: monospace;">${row.id}</td>
                                 <td><strong>${tglFormat}</strong></td>
-                                <td>${row.jam}</td>
+                                <td><span style="background: #eef2f7; padding: 3px 6px; border-radius: 4px; font-weight: bold;">${row.jam || '-'}</span></td>
                                 <td>${row.nama}</td>
-                                <td><a href="https://wa.me/${waLink}" target="_blank" class="btn-wa">Chat WA</a></td>
-                                <td>${row.keluhan}</td>
-                                <td><span class="${statusClass}">${row.status}</span></td>
+                                <td><a href="https://wa.me/${waLink}" target="_blank" class="btn-wa">💬 Chat Admin</a></td>
+                                <td style="max-width: 250px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;" title="${row.keluhan}">${row.keluhan}</td>
+                                <td><span class="status-badge ${statusBadgeClass}">${row.status || 'Pending'}</span></td>
                             </tr>`;
                             tbody.innerHTML += tr;
                         });
+
+                        // Suntikkan angka hasil hitungan ke kartu dasbor atas
+                        document.getElementById('countTotal').innerText = totalPasien;
+                        document.getElementById('countPending').innerText = totalPending;
+                        document.getElementById('countSelesai').innerText = totalSelesai;
+
                     } else {
                         tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 20px;">Belum ada data reservasi pasien.</td></tr>`;
                     }
                 })
                 .catch(error => {
-                    document.getElementById('tabelData').innerHTML = `<tr><td colspan="7" style="text-align: center; color: red; padding: 20px;">❌ Gagal memuat data. Pastikan URL API benar dan Deploy diatur ke 'Anyone'.</td></tr>`;
+                    document.getElementById('tabelData').innerHTML = `<tr><td colspan="7" style="text-align: center; color: red; padding: 20px;">❌ Gagal memuat data aman. Pastikan token sinkron dan konfigurasi deploy sudah 'Anyone'.</td></tr>`;
                 });
         }
 
-        // Panggil fungsi saat halaman dimuat
+        // Jalankan saat halaman dibuka
         muatData();
     </script>
 </body>
