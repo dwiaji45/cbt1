@@ -12,10 +12,11 @@
         /* Desain Dasar */
         body { 
             font-family: 'Poppins', sans-serif; 
-            background: #f0f4f8; /* Warna background lebih lembut */
+            background: #f0f4f8; 
             margin: 0; 
             padding: 30px 15px;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
@@ -30,6 +31,7 @@
             width: 100%;
             max-width: 450px;
             box-sizing: border-box;
+            margin-bottom: 20px;
         }
         
         /* Area Logo */
@@ -59,12 +61,12 @@
         .form-group { margin-bottom: 18px; }
         label { 
             display: block; 
-            margin-bottom: 6px; 
+            margin-bottom: 8px; 
             font-weight: 500; 
             font-size: 13px;
             color: #475569;
         }
-        input, textarea, select { 
+        input, textarea { 
             width: 100%; 
             padding: 12px 15px; 
             border: 1.5px solid #cbd5e1; 
@@ -78,11 +80,66 @@
         }
         
         /* Efek saat input diklik */
-        input:focus, textarea:focus, select:focus {
+        input:focus, textarea:focus {
             outline: none;
             border-color: #27ae60;
             background-color: white;
             box-shadow: 0 0 0 4px rgba(39, 174, 96, 0.1);
+        }
+
+        /* TAMPILAN GRID SESI KEKINIAN (Ala Bioskop / Halodoc) */
+        .session-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 10px;
+            margin-top: 5px;
+        }
+        .session-item {
+            position: relative;
+        }
+        .session-item input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .session-label {
+            display: block;
+            text-align: center;
+            background-color: #f1f5f9;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 12px 8px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-sizing: border-box;
+        }
+        .session-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 2px;
+        }
+        .session-time {
+            font-size: 11px;
+            color: #64748b;
+        }
+        /* Efek Hover Pilihan Sesi */
+        .session-label:hover {
+            background-color: #e2e8f0;
+            border-color: #cbd5e1;
+        }
+        /* Efek Saat Sesi Terpilih (Checked) */
+        .session-item input[type="radio"]:checked + .session-label {
+            background-color: #ecfdf5;
+            border-color: #27ae60;
+            box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.15);
+        }
+        .session-item input[type="radio"]:checked + .session-label .session-title {
+            color: #065f46;
+        }
+        .session-item input[type="radio"]:checked + .session-label .session-time {
+            color: #047857;
         }
 
         /* Desain Tombol */
@@ -102,7 +159,8 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 10px; /* Jarak antara teks dan spinner */
+            gap: 10px;
+            margin-top: 25px;
         }
         button:hover { 
             background: linear-gradient(135deg, #229954, #1e8449); 
@@ -124,7 +182,7 @@
             border-radius: 50%;
             border-top-color: white;
             animation: spin 1s ease-in-out infinite;
-            display: none; /* Disembunyikan secara default */
+            display: none;
         }
         @keyframes spin {
             to { transform: rotate(360deg); }
@@ -138,10 +196,42 @@
             font-size: 13px; 
             padding: 10px;
             border-radius: 8px;
-            display: none; /* Disembunyikan sebelum ada aksi */
+            display: none;
         }
         .pesan-sukses { background-color: #d1fae5; color: #065f46; display: block !important; }
         .pesan-error { background-color: #fee2e2; color: #b91c1c; display: block !important; }
+
+        /* DESAIN FOOTER KLINIK MODERN */
+        .clinic-footer {
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            padding: 15px;
+            box-sizing: border-box;
+            color: #64748b;
+            font-size: 12px;
+            line-height: 1.6;
+            border-top: 1px solid #e2e8f0;
+            margin-top: 10px;
+        }
+        .clinic-footer .title {
+            font-weight: 600;
+            color: #334155;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+        .clinic-footer .address {
+            margin-bottom: 6px;
+            color: #64748b;
+        }
+        .clinic-footer .contact {
+            font-weight: 500;
+            color: #27ae60;
+            text-decoration: none;
+        }
+        .clinic-footer .contact:hover {
+            text-decoration: underline;
+        }
 
     </style>
 </head>
@@ -159,23 +249,48 @@
                 <label>Nama Lengkap</label>
                 <input type="text" id="nama" placeholder="Masukkan nama Anda" required>
             </div>
+            
             <div class="form-group">
                 <label>Nomor WhatsApp</label>
                 <input type="number" id="no_wa" placeholder="Contoh: 08123456789" required>
             </div>
+            
             <div class="form-group">
                 <label>Tanggal Bekam</label>
                 <input type="date" id="tanggal" required>
             </div>
+            
             <div class="form-group">
-                <label>Pilih Jam</label>
-                <select id="jam" required>
-                    <option value="" disabled selected>-- Pilih Waktu --</option>
-                    <option value="09:00">09:00 WIB</option>
-                    <option value="13:00">13:00 WIB</option>
-                    <option value="16:00">16:00 WIB</option>
-                </select>
+                <label>Pilih Sesi Kedatangan</label>
+                <div class="session-grid">
+                    
+                    <div class="session-item">
+                        <input type="radio" id="sesiPagi" name="sesi_waktu" value="Sesi Pagi (09:00 - 11:30)" required>
+                        <label for="sesiPagi" class="session-label">
+                            <div class="session-title">Sesi Pagi</div>
+                            <div class="session-time">09:00 - 11:30 WIB</div>
+                        </label>
+                    </div>
+                    
+                    <div class="session-item">
+                        <input type="radio" id="sesiSiang" name="sesi_waktu" value="Sesi Siang (13:00 - 15:00)">
+                        <label for="sesiSiang" class="session-label">
+                            <div class="session-title">Sesi Siang</div>
+                            <div class="session-time">13:00 - 15:00 WIB</div>
+                        </label>
+                    </div>
+                    
+                    <div class="session-item">
+                        <input type="radio" id="sesiSore" name="sesi_waktu" value="Sesi Sore (15:30 - 17:30)">
+                        <label for="sesiSore" class="session-label">
+                            <div class="session-title">Sesi Sore</div>
+                            <div class="session-time">15:30 - 17:30 WIB</div>
+                        </label>
+                    </div>
+                    
+                </div>
             </div>
+            
             <div class="form-group">
                 <label>Keluhan Utama</label>
                 <textarea id="keluhan" rows="3" required placeholder="Misal: Pegal-pegal, tensi tinggi, kolesterol..."></textarea>
@@ -188,6 +303,12 @@
         </form>
 
         <div id="pesan"></div>
+    </div>
+
+    <div class="clinic-footer">
+        <div class="title">🌙 Rumah Bekam Monggang</div>
+        <div class="address">📍 Monggang, Kel. Pende, Kec. Bantul, Kabupaten Bantul, Daerah Istimewa Yogyakarta</div>
+        <div>Kontak Admin: <a href="https://wa.me/62859148395363" class="contact" target="_blank">+62 859-1483-95363</a></div>
     </div>
 
     <script>
@@ -211,15 +332,17 @@
             const inputNama = document.getElementById('nama').value;
             const inputNoWA = document.getElementById('no_wa').value;
             const inputTanggal = document.getElementById('tanggal').value;
-            const inputJam = document.getElementById('jam').value;
             const inputKeluhan = document.getElementById('keluhan').value;
+            
+            // Mengambil nilai radio button sesi yang terpilih
+            const selectedSessionElement = document.querySelector('input[name="sesi_waktu"]:checked');
+            const inputJam = selectedSessionElement ? selectedSessionElement.value : '-';
 
             // --- TAMPILKAN ANIMASI LOADING ---
             btnText.innerText = "Memproses Data...";
             spinner.style.display = "block";
             btnSubmit.disabled = true;
             
-            // Reset kotak pesan
             pesan.className = "";
             pesan.innerText = "";
 
@@ -243,13 +366,13 @@
                     pesan.innerText = "✅ Berhasil! Mengarahkan ke WhatsApp...";
                     
                     const tanggalFormat = formatTanggalIndo(inputTanggal);
-                    const textPesan = `Assalamu'alaikum Rumah Bekam Monggang, 🙏\n\nSaya telah mengisi form reservasi di website. Berikut detail jadwal saya:\n\n*Nama* : ${inputNama}\n*No. WA* : ${inputNoWA}\n*Tanggal* : ${tanggalFormat}\n*Jam* : ${inputJam} WIB\n*Keluhan* : ${inputKeluhan}\n\nTerima kasih, saya tunggu konfirmasinya nggih.`;
+                    const textPesan = `Assalamu'alaikum Rumah Bekam Monggang, 🙏\n\nSaya telah mengisi form reservasi di website. Berikut detail jadwal saya:\n\n*Nama* : ${inputNama}\n*No. WA* : ${inputNoWA}\n*Tanggal* : ${tanggalFormat}\n*Sesi Kedatangan* : ${inputJam}\n*Keluhan* : ${inputKeluhan}\n\nTerima kasih, saya tunggu konfirmasinya nggih.`;
                     
                     setTimeout(() => {
                         window.open(`https://wa.me/${NOMOR_WA_ADMIN}?text=${encodeURIComponent(textPesan)}`, '_blank');
                         document.getElementById('bookingForm').reset();
-                        pesan.className = ""; // Sembunyikan pesan sukses setelah dialihkan
-                    }, 1500); // Beri jeda 1,5 detik agar user sempat membaca tulisan sukses
+                        pesan.className = "";
+                    }, 1500);
 
                 } else {
                     pesan.className = "pesan-error";
@@ -261,7 +384,6 @@
                 pesan.innerText = "❌ Gagal terhubung ke server.";
             })
             .finally(() => {
-                // --- KEMBALIKAN TOMBOL SEPERTI SEMULA ---
                 btnText.innerText = "Kirim Reservasi";
                 spinner.style.display = "none";
                 btnSubmit.disabled = false;
