@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reservasi Rumah Bekam Monggang</title>
     
-    <!-- Import Font Modern dari Google -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/1RJkvv-OsdOchFl2L-oimzZpHAOzoPAZr">
     
@@ -330,7 +329,6 @@
 
     <div class="form-container">
         
-        <!-- TOOLBAR AKSESIBILITAS BARU -->
         <div class="accessibility-bar">
             <div class="control-group">
                 <span class="control-label">Ukuran</span>
@@ -367,7 +365,6 @@
                 <input type="date" id="tanggal" required>
             </div>
             
-            <!-- SELEKSI WAKTU MODEL GRID KEKINIAN -->
             <div class="form-group">
                 <label>Pilih Sesi Kedatangan</label>
                 <div class="session-grid">
@@ -413,7 +410,6 @@
         <div id="pesan"></div>
     </div>
 
-    <!-- FOOTER INFORMASI KLINIK -->
     <div class="clinic-footer">
         <div class="title">Rumah Bekam Monggang</div>
         <div class="address">Monggang, RT 37, Pendowoharjo, Kec. Sewon, Kabupaten Bantul, Daerah Istimewa Yogyakarta</div>
@@ -505,11 +501,12 @@ Saya telah mengisi form reservasi di website. Berikut detail jadwal saya:
 
 Terima kasih, saya tunggu konfirmasinya nggih.`;
                     
+                    // FIXED FOR iOS: Menggunakan window.location.href dengan waktu delay singkat (600ms)
                     setTimeout(() => {
-                        window.open(`https://wa.me/${NOMOR_WA_ADMIN}?text=${encodeURIComponent(textPesan)}`, '_blank');
                         document.getElementById('bookingForm').reset();
                         pesan.className = "";
-                    }, 1500);
+                        window.location.href = `https://wa.me/${NOMOR_WA_ADMIN}?text=${encodeURIComponent(textPesan)}`;
+                    }, 600);
 
                 } else {
                     pesan.className = "pesan-error";
